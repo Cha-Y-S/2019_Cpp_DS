@@ -1,287 +1,277 @@
+// SLL
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-class ArrayStack {
-public:
-	int top;
-	int* stack;
-	int maxSize;
-
-	ArrayStack(int size) {
-		top = -1;
-		stack = new int[size];
-		maxSize = size;
+struct Node
+{
+	int data;
+	Node* next;
+	Node(int value)
+	{
+		data = value;
+		next = NULL;
 	}
+};
+
+class Stack
+{
+private:
+	int top;
+	vector<int> stack;
+public:
+	Stack();
 	bool isEmpty();
-	bool isFull();
-	void push(int data);
+	void push(int value);
 	int pop();
 };
 
-bool ArrayStack::isEmpty() {
+Stack::Stack()
+{
+	top = -1;
+	vector<int> stack(1);
+}
+
+bool Stack::isEmpty()
+{
 	if (top == -1) return true;
 	else return false;
 }
 
-bool ArrayStack::isFull() {
-	if (top == maxSize - 1) return true;
-	else return false;
+void Stack::push(int value)
+{
+	stack.push_back(value);
+	top++;
 }
 
-void ArrayStack::push(int data) {
-	if (isFull())
-		cout << "Stack is full" << endl;
-	else {
-		top++;
-		stack[top] = data;
+int Stack::pop()
+{
+	if (top == -1)
+		return -1;
+	else
+	{
+		int num = stack[top--];
+		stack.pop_back();
+		return num;
 	}
 }
 
-int ArrayStack::pop() {
-	if (isEmpty()) {
-		cout << "Stack is empty" << endl;
-		return 0;
-	}
-	else return stack[top--];
-}
-
-struct Node {
-	int data;
-	Node *next;
-	Node(int value) {
-		data = value;
-		next = 0;
-	}
-};
-
-class List {
+class LinkedList
+{
 private:
-	Node *head = 0;
+	Node *head;
 public:
-	List() {
-		head = 0;
-	}
+	LinkedList();
+	~LinkedList();
 	bool isEmpty();
 	void insertNode(int value);
 	void deleteNode(int value);
-	void displayList();
-	void searchList(int value);
+	void searchNode(int value);
 	void printLast();
+	void printList();
 	void printNth(int value);
 	void invertList();
-	~List();
 };
 
-void List::invertList() {
-	Node *p = head;
-	ArrayStack stack(100);
-
-	if (!isEmpty()) {
-		while (p != 0) {
-			stack.push(p->data);
-			p = p->next;
-		}
-		cout << "List : ";
-		while (stack.top != -1) {
-			cout << stack.pop() << " ";
-		}
-		cout << endl;
-	}
-	else
-		cout << "List is Empty" << endl;
+LinkedList::LinkedList()
+{
+	head = NULL;
 }
 
-List::~List() {
-	Node *p = head;
+LinkedList::~LinkedList()
+{
+	Node *p;
 
-	while (head != 0) {
+	while (head != NULL)
+	{
 		p = head;
 		head = head->next;
 		delete p;
 	}
 }
 
-void List::printLast() {
-	Node *p = head;
-	Node *q = 0;
-
-	if (isEmpty()) cout << "List is Empty" << endl;
-	else {
-		while (p != 0) {
-			q = p;
-			p = p->next;
-		}
-		cout << q->data << endl;
-	}
+bool LinkedList::isEmpty()
+{
+	if (head == NULL)
+		return true;
+	else
+		return false;
 }
 
-void List::printNth(int value) {
-	Node *p = 0;
-	int cnt = 1;
-	if (isEmpty()) cout << "List is Empty" << endl;
-	else {
-		p = head;
-		while (p != 0) {
-			if (cnt == value) {
-				cout << p->data << endl;
-				break;
-			}
-			p = p->next;
-			cnt++;
-		}
-		if (p == 0) cout << value << " list is not found" << endl;
-	}
-}
-
-void List::insertNode(int value) {
+void LinkedList::insertNode(int value)
+{
 	Node *temp = new Node(value);
-	Node *p = head;
-	Node *q = 0;
+	Node *p, *q;
 
-	if (head == 0) {
+	if (isEmpty())
 		head = temp;
-	}
-	else if (temp->data < head->data) {
+	else if (temp->data < head->data)
+	{
 		temp->next = head;
 		head = temp;
 	}
-	else {
+	else
+	{
 		p = head;
-		while ((p != 0) && (p->data < temp->data)) {
+		q = head;
+		while ((p != NULL) && (p->data < temp->data))
+		{
 			q = p;
 			p = p->next;
 		}
-		if (p != 0) {
+		if (p != NULL)
+		{
 			temp->next = p;
 			q->next = temp;
 		}
-		else {
+		else
 			q->next = temp;
-		}
 	}
 }
 
-bool List::isEmpty() {
-	if (head == 0) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
+void LinkedList::deleteNode(int value)
+{
+	Node *p = NULL;
+	Node *q = NULL;
 
-void List::displayList() {
-	Node *p;
-
-	if (!isEmpty()) {
+	if (isEmpty())
+		cout << "List is Empty" << endl;
+	else if (head->data == value)
+	{
 		p = head;
-		cout << "list : ";
-		while (p) {
+		head = head->next;
+		delete p;
+	}
+	else
+	{
+		p = head;
+		while ((p != NULL) && (p->data != value))
+		{
+			q = p;
+			p = p->next;
+		}
+		if (p != NULL)
+		{
+			q->next = p->next;
+			delete p;
+		}
+		else
+			cout << value << " is not in the list" << endl;
+	}
+}
+
+void LinkedList::searchNode(int value)
+{
+	Node *p = head;
+	int cnt = 1;
+	while ((p != NULL) && (p->data == value))
+	{
+		p = p->next;
+		cnt++;
+	}
+	if (p == NULL)
+		cout << value << " is not in the list" << endl;
+	else
+		cout << value << " is in the list at " << cnt << " position." << endl;
+}
+
+void LinkedList::printLast()
+{
+	Node *p = head;
+	if (isEmpty())
+		cout << "List is Empty" << endl;
+	else
+	{
+		while (p->next != NULL)
+			p = p->next;
+		cout << p->data << " is last data of list" << endl;
+	}
+}
+
+void LinkedList::printList()
+{
+	if (isEmpty())
+		cout << "List is Empty" << endl;
+	else
+	{
+		Node *p = head;
+		cout << "List : ";
+		while (p != NULL)
+		{
 			cout << p->data << " ";
 			p = p->next;
 		}
 		cout << endl;
-	}
-	else {
-		cout << "List is empty!" << endl;
+
 	}
 }
 
-void List::deleteNode(int value) {
-	Node *p = head;
-	Node *q = 0;
-
+void LinkedList::printNth(int value)
+{
 	if (isEmpty())
-		cout << value << " is not in the list" << endl;
-	else if (head->data == value) {
-		p = head;
-		head = head->next;
-		delete p;
-	}
-	else {
-		p = head;
-		while (p != 0 && p->data != value) {
-			q = p;
+		cout << "List is Empty" << endl;
+	else
+	{
+		Node *p = head;
+		int cnt = 1;
+		while ((p != NULL) && (cnt == value))
+		{
 			p = p->next;
+			cnt++;
 		}
-		if (p != 0) {
-			q->next = p->next;
-			delete p;
-		}
-		else {
-			cout << value << " is not in the list" << endl;
-		}
+		if (p != NULL)
+			cout << value << " th data is not in the list" << endl;
+		else
+			cout << value << " th data is " << p->data << endl;
 	}
 }
 
-void List::searchList(int value) {
-	Node *p;
-
-	if (head != 0) {
-		p = head;
-		while (p != 0 && p->data != value) {
+void LinkedList::invertList()
+{
+	Stack stack;
+	
+	Node *p = head;
+	
+	if (isEmpty())
+		cout << "List is Empty" << endl;
+	else
+	{
+		while (p != NULL)
+		{
+			stack.push(p->data);
 			p = p->next;
 		}
-		if (p) {
-			cout << p->data << " is in the list" << endl;
+		cout << "Invert List : ";
+		while (!stack.isEmpty())
+		{
+			cout << stack.pop() << " ";
 		}
-		else {
-			cout << value << " is not in the list" << endl;
-		}
-	}
-	else {
-		cout << "List is empty" << endl;
+		cout << endl;
 	}
 }
 
-int main() {
-	List ll;
-	int input = 0;
+int main()
+{
+	LinkedList sll;
 
-	cout << "1.insert" << endl;
-	cout << "2.delete" << endl;
-	cout << "3.list" << endl;
-	cout << "4.search" << endl;
-	cout << "5.PrintLast" << endl;
-	cout << "6.PrintNth" << endl;
-	cout << "7.InvertList" << endl;
-	cout << "8.Quit" << endl;
+	sll.deleteNode(10);
+	
+	sll.insertNode(10);
+	sll.insertNode(5);
+	sll.printList();
 
-	while (1) {
-		int value;
-		cin >> input;
-		switch (input) {
-		case 1:
-			cin >> value;
-			ll.insertNode(value);
-			break;
-		case 2:
-			cin >> value;
-			ll.deleteNode(value);
-			break;
-		case 3:
-			ll.displayList();
-			break;
-		case 4:
-			cin >> value;
-			ll.searchList(value);
-			break;
-		case 5:
-			ll.printLast();
-			break;
-		case 6:
-			cin >> value;
-			ll.printNth(value);
-			break;
-		case 7:
-			ll.invertList();
-			break;
-		default:
-			ll.~List();
-			cout << "All List is removed" << endl;
-			break;
-		}
-		if (input == 8) break;
-	}
+	sll.insertNode(30);
+	sll.searchNode(5);
+
+	sll.deleteNode(5);
+	sll.printList();
+
+	sll.printNth(3);
+	sll.printLast();
+
+	sll.insertNode(40);
+	sll.invertList();
+
+	return 0;
 }

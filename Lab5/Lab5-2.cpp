@@ -1,189 +1,283 @@
+// Linked Stack and Queue
 #include <iostream>
+#define MAX_SIZE 999
 
 using namespace std;
 
-class Stack {
+class Stack
+{
 private:
-	int size;
 	int top;
-	char *stack;
+	int size;
+	char* stack;
 public:
 	Stack(int value);
-	int getSize();
 	bool isFull();
 	bool isEmpty();
 	void push(char value);
 	char pop();
-	void display();
 };
 
-Stack::Stack(int value) {
-	size = value;
+Stack::Stack(int value)
+{
 	top = -1;
+	size = value;
 	stack = new char[size];
 }
 
-int Stack::getSize() {
-	return size;
-}
-
-bool Stack::isFull() {
+bool Stack::isFull()
+{
 	if (top == size - 1)
 		return true;
 	else
 		return false;
 }
 
-bool Stack::isEmpty() {
+bool Stack::isEmpty()
+{
 	if (top == -1)
 		return true;
 	else
 		return false;
 }
 
-void Stack::push(char value) {
+void Stack::push(char value)
+{
 	if (isFull())
-		cout << "Stack is Full" << endl;
+		return;
 	else
 		stack[++top] = value;
 }
 
-char Stack::pop() {
-	if (isEmpty()) {
-		cout << "Stack is Empty" << endl;
-		return 0;
-	}
+char Stack::pop()
+{
+	if (isEmpty())
+		return -1;
 	else
 		return stack[top--];
+
 }
 
-void Stack::display() {
-	if (isEmpty())
-		cout << "Stack is Empty" << endl;
-	else {
-		int i = top;
-		cout << "List1 : ";
-		for (; i > -1; i--)
-			cout << stack[i] << " ";
-		cout << endl;
-	}
-}
-
-class Queue{
-private:
-	int front;
-	int rear;
-	int size;
-	char *queue;
-public:
-	Queue(int value);
-	int getSize();
-	bool isFull();
-	bool isEmpty();
-	void enqueue(char value);
-	char dequeue();
-	void display();
-};
-
-Queue::Queue(int value) {
-	size = value;
-	front = -1;
-	rear = -1;
-	queue = new char[size];
-}
-
-int Queue::getSize() {
-	return size;
-}
-
-bool Queue::isFull() {
-	if (rear == size - 1)
-		return true;
-	else
-		return false;
-}
-
-bool Queue::isEmpty() {
-	if (rear == front)
-		return true;
-	else
-		return false;
-}
-
-void Queue::enqueue(char value) {
-	if (isFull())
-		cout << "Queue is Full" << endl;
-	else
-		queue[++rear] = value;
-}
-
-char Queue::dequeue() {
-	if (isEmpty()) {
-		cout << "Queue is Empty" << endl;
-		return 0;
-	}
-	else
-		return queue[++front];
-}
-
-void Queue::display() {
-	if (isEmpty())
-		cout << "Queue is Empty" << endl;
-	else {
-		int i = front + 1;
-		cout << "List2 : ";
-		for (; i < rear + 1; i++)
-			cout << queue[i] << " ";
-		cout << endl;
-	}
-}
-
-struct Node {
+struct Node
+{
 	char data;
-	Node* next;
-	Node(char value) {
+	Node *next;
+	Node(int value)
+	{
 		data = value;
-		next = 0;
+		next = NULL;
 	}
 };
 
-class List {
+class LinkedStack
+{
 private:
 	Node *head;
 public:
-	List() { head = 0; }
+	LinkedStack();
 	bool isEmpty();
-	void insert(char value);
-	void concatenate(Stack stack, Queue queue);
-	// 2개의 리스트를 합쳐서 새로운 리스트를 만드는 함수
-	void display();
-	void invert();
-	// 현재의 리스트를 역순으로 출력하는 함수;
+	void push(char value);
+	char pop();
+	void displayStack();
 };
 
-bool List::isEmpty() {
-	if (head == 0)
+LinkedStack::LinkedStack()
+{
+	head = NULL;
+}
+
+bool LinkedStack::isEmpty()
+{
+	if (head == NULL) return true;
+	else return false;
+}
+
+void LinkedStack::push(char value)
+{
+	Node *temp = new Node(value);
+
+	if (isEmpty())
+		head = temp;
+	else
+	{
+		temp->next = head;
+		head = temp;
+	}
+}
+
+char LinkedStack::pop()
+{
+	Node *p; char a;
+	if (isEmpty())
+	{
+		a = -1;
+	}
+	else
+	{
+		a = head->data;
+		p = head;
+		head = head->next;
+		delete p;
+	}
+	return a;
+}
+
+void LinkedStack::displayStack()
+{
+	if (isEmpty())
+		cout << "Stack is empty" << endl;
+	else
+	{
+		Stack stack(MAX_SIZE);
+		
+		cout << "List 1 : ";
+
+		while (!isEmpty())
+		{
+			char a = pop();
+			stack.push(a);
+			cout << a << " ";
+		}
+		cout << endl;
+			
+		while (!stack.isEmpty())
+			push(stack.pop());
+	}
+}
+
+class LinkedQueue
+{
+private:
+	Node *front;
+	Node *rear;
+public:
+	LinkedQueue();
+	bool isEmpty();
+	void enqueue(char value);
+	char dequeue();
+	void displayQueue();
+};
+
+LinkedQueue::LinkedQueue()
+{
+	front = NULL; rear = NULL;
+}
+
+bool LinkedQueue::isEmpty()
+{
+	if (front == NULL) return true;
+	else return false;
+}
+
+void LinkedQueue::enqueue(char value)
+{
+	Node *temp = new Node(value);
+
+	if (isEmpty())
+	{
+		front = temp;
+		rear = temp;
+	}
+	else
+	{
+		rear->next = temp;
+		rear = temp;
+	}
+}
+
+char LinkedQueue::dequeue()
+{
+	Node *p; char a;
+
+	if (isEmpty())
+		a = -1;
+		
+	else
+	{
+		a = front->data;
+		p = front;
+
+		if (front == rear)
+		{
+			front = NULL;
+			rear = NULL;
+		}
+		else
+			front = front->next;
+
+		delete p;
+	}
+	return a;
+}
+
+void LinkedQueue::displayQueue()
+{
+	Node *p;
+	
+	if (isEmpty())
+		cout << "Queue is Empty" << endl;
+	else
+	{
+		p = front;
+		cout << "List 2 : ";
+		while (p != NULL)
+		{
+			cout << p->data << " ";
+			p = p->next;
+		}
+		cout << endl;
+	}
+}
+
+class LinkedList
+{
+private:
+	Node *head;
+public:
+	LinkedList();
+	bool isEmpty();
+	void insertNode(char value);
+	void printList(int value);
+	void invertList();
+	void concatenate(LinkedStack ls, LinkedQueue lq);
+};
+
+LinkedList::LinkedList()
+{
+	head = NULL;
+}
+
+bool LinkedList::isEmpty()
+{
+	if (head == NULL)
 		return true;
 	else
 		return false;
 }
 
-void List::insert(char value) {
-	Node * temp = new Node(value);
-	Node *p = 0, *q = 0;
-	
-	if (isEmpty()) head = temp;
-	else if (temp->data < head->data) {
+void LinkedList::insertNode(char value)
+{
+	Node *temp = new Node(value);
+	Node *p, *q;
+
+	if (isEmpty())
+		head = temp;
+	else if (temp->data < head->data)
+	{
 		temp->next = head;
 		head = temp;
 	}
-	else {
+	else
+	{
 		p = head;
-		while ((p != 0) && (p->data < temp->data)) {
+		q = head;
+		while ((p != NULL) && (p->data < temp->data))
+		{
 			q = p;
 			p = p->next;
 		}
-		if (p != 0) {
+		if (p != NULL)
+		{
 			temp->next = p;
 			q->next = temp;
 		}
@@ -192,63 +286,81 @@ void List::insert(char value) {
 	}
 }
 
-void List::concatenate(Stack stack, Queue queue) {
-	int stackSize = stack.getSize();
-	int queueSize = queue.getSize();
-
-	for (int i = 0; i < stackSize; i++)
-		insert(stack.pop());
-	for (int i = 0; i < queueSize; i++)
-		insert(queue.dequeue());
-}
-
-void List::display() {
+void LinkedList::printList(int value)
+{
 	if (isEmpty())
-		cout << "Linked List is Empty" << endl;
-	else {
+		cout << "List is Empty" << endl;
+	else
+	{
 		Node *p = head;
-		cout << "List3 : ";
-		while (p != 0) {
+		cout << "List " << value << " : ";
+		while (p != NULL)
+		{
 			cout << p->data << " ";
 			p = p->next;
 		}
 		cout << endl;
+
 	}
 }
 
-void List::invert() {
+void LinkedList::invertList()
+{
+	LinkedStack stack;
+	LinkedList returnList;
+
+	Node *p = head;
+
 	if (isEmpty())
-		cout << "Linked List is Empty" << endl;
-	else {
-		Node *p = head;
-		Stack stack(100);
-		cout << "List4 : ";
-		while (p != 0) {
+	{
+		cout << "List is Empty" << endl;
+	}
+		
+	else
+	{
+		while (p != NULL)
+		{
 			stack.push(p->data);
 			p = p->next;
 		}
-		while (!stack.isEmpty()) {
-			cout << stack.pop() << " ";
+		cout << "List 4 : ";
+		while (!stack.isEmpty())
+		{
+			char a = stack.pop();
+			insertNode(a);
+			cout << a << " ";
 		}
-		cout << endl;
 	}
 }
 
-int main() {
-	Stack stack(2);
-	Queue queue(3);
-	List list;
+void LinkedList::concatenate(LinkedStack ls, LinkedQueue lq)
+{
+	while (!ls.isEmpty())
+		insertNode(ls.pop());
+	while (!lq.isEmpty())
+		insertNode(lq.dequeue());
+}
 
-	stack.push('a');
-	stack.push('e');
-	stack.display();
+int main()
+{
+	LinkedStack list1;
+	LinkedQueue list2;
+	LinkedList list3;
+	LinkedList list4;
 
-	queue.enqueue('b');
-	queue.enqueue('c');
-	queue.enqueue('d');
-	queue.display();
+	list1.push('a');
+	list1.push('e');
+	list1.displayStack();
 
-	list.concatenate(stack, queue);
-	list.display();
-	list.invert();
+	list2.enqueue('b');
+	list2.enqueue('c');
+	list2.enqueue('d');
+	list2.displayQueue();
+
+	list3.concatenate(list1, list2);	
+	list3.printList(3);
+
+	list3.invertList();
+
+	return 0;
 }
