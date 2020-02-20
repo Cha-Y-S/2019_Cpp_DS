@@ -1,283 +1,329 @@
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
-struct Node {
+struct Node
+{
 	string name;
 	int weight;
 	int height;
-	Node *next;
-	Node *prev;
-	Node(string s, int w, int h) {
-		name = s;
-		weight = w;
-		height = h;
-		next = 0;
-		prev = 0;
+	Node* prev;
+	Node* next;
+	Node(string name, int weight, int height)
+	{
+		this->name = name;
+		this->weight = weight;
+		this->height = height;
+		prev = NULL;
+		next = NULL;
 	}
 };
 
-class Dll {
-private:
-	Node *head;
+class Dll
+{
 public:
-	Dll() {
-		head = 0;
-	}
+	Dll();
 	~Dll();
 	bool isEmpty();
-	void insertList(string s, int w, int h);
-	void insertAfter(string s, int w, int h, int value);
-	void deleteList(string s);
-	void forwardList();
-	void backwardList();
-	void searchList(string s);
-	void findNth(int value);
+	void insertDll(string n, int w, int h);
+	void insertAfter(string n, int w, int h, int value);
+	void deleteDll(string n);
+	void forward();
+	void backward();
+	void searchDll(string n);
+	void findNth(int n);
+private:
+	Node* head;
 };
 
-Dll::~Dll() {
-	Node *p = head;
+Dll::Dll()
+{
+	head = NULL;
+}
 
-	while (head != 0) {
-		p = head;
+Dll::~Dll()
+{
+	while (head != NULL)
+	{
+		Node *p = head;
 		head = head->next;
 		delete p;
 	}
 }
 
-bool Dll::isEmpty() {
-	if (head == 0) return true;
-	else return false;
+bool Dll::isEmpty()
+{
+	if (head == NULL)
+		return true;
+	else
+		return false;
 }
 
-void Dll::insertAfter(string s, int w, int h, int value) {
-	Node *temp = new Node(s, w, h);
-	Node *p = 0;
-	Node *q = 0;
-	int pos = 1;
-
-	if (isEmpty()) cout << "List is empty." << endl;
-	else {
-		p = head;
-		while (p != 0) {
-			if (pos == value) {
-				q = p;
-				p = p->next;
-				temp->next = p;
-				temp->prev = q;
-				p->prev = temp;
-				q->next = temp;
-				break;
-			}
-			q = p;
-			p = p->next;
-			pos++;
-		}
-		if (p == 0) cout << value << " list is not in the list." << endl;
-	}
-	forwardList();
-}
-
-void Dll::insertList(string s, int w, int h) {
-	Node *temp = new Node(s, w, h);
-	Node *p = 0;
-	Node *q = 0;
-
-	if (isEmpty()) {
+void Dll::insertDll(string n, int w, int h)
+{
+	Node* temp = new Node(n, w, h);
+	
+	if (head == NULL)
 		head = temp;
-	}
-	else if (temp->name < head->name) {
+	else if (temp->name < head->name)
+	{
 		temp->next = head;
 		head->prev = temp;
 		head = temp;
 	}
-	else {
+	else
+	{
+		Node *p, *q;
 		p = head;
-		while (p != 0 && p->name < temp->name) {
+		q = NULL;
+		while ((p != NULL) && (temp->name > head->name))
+		{
 			q = p;
 			p = p->next;
 		}
-		if (p != 0) {
-			temp->next = p;
-			temp->prev = q;
+		if (p == NULL)
+		{
 			q->next = temp;
-			p->prev = temp;
+			temp->prev = q;
 		}
-		else {
-			q->next = temp;
-			temp->prev = q;
+		else
+		{
+			q->next = temp;	temp->prev = q;
+			temp->next = p;	p->prev = temp;
 		}
 	}
 }
 
-void Dll::deleteList(string s) {
-	Node *p = 0;
-	Node *q = 0;
+void Dll::insertAfter(string n, int w, int h, int value)
+{
+	Node *temp = new Node(n, w, h);
+	Node *p, *q;
+	int cnt = 0;
+	p = head;
+	q = NULL;
+	
+	while ((p != NULL) && (cnt != value))
+	{
+		q = p;
+		p = p->next;
+		cnt++;
+	}
+	if (p == NULL || value < 0)
+		cout << "Can't insert" << endl;
+	else
+	{
+		q->next = temp;	temp->prev = q;
+		temp->next = p;	p->prev = temp;
+	}
+}
+
+void Dll::deleteDll(string n)
+{
+	Node *p, *q;
+	p = head;
+	q = NULL;
+
 
 	if (isEmpty())
-		cout << "List is empty." << endl;
-	else if (head->name == s) {
-		if (head->next != 0) {
+		cout << "List is empty" << endl;
+	else
+	{
+		if (head->name == n)
+		{
+			if (head->next == NULL)
+				delete p;
+			else
+			{
+				head = head->next;
+				head->prev = NULL;
+				delete p;
+			}
+		}
+		else
+		{
+			while ((p != NULL) && p->name != n)
+			{
+				q = p;
+				p = p->next;
+			}
+			if (p->name == n)
+			{
+				if (p->next == NULL)
+				{
+					q->next = NULL;
+					delete p;
+				}
+				else
+				{
+					q->next = p->next;
+					p->next->prev = q;
+					delete p;
+				}
+			}
+			else
+				cout << n << " is not in the list" << endl;
+		}
+	}
+	/*if (isEmpty())
+		cout << "List is empty" << endl;
+	else if (head->name == n)
+	{
+		if (head->next != NULL)
+		{
 			p = head;
 			head = head->next;
-			head->prev = 0;
 			delete p;
 		}
 		else
-			head = 0;
+			head = NULL;
 	}
-	else {
-		p = head;
-		while (p != 0 && p->name != s) {
+	else
+	{
+		while ((p != NULL) && (p->name != n))
+		{
 			q = p;
 			p = p->next;
 		}
-		if (p->next != 0 && p->name == s) {
-			q->next = p->next;
-			p->next->prev = q;
-			delete p;
-		}
-		else if (p->next == 0 && p->name == s) {
-			q->next = 0;
-			delete p;
-		}
+		if (p == NULL)
+			cout << n << "'s Node is not in the list" << endl;
 		else
-			cout << s << " is not in the list" << endl;
-	}
-	forwardList();
-}
-
-void Dll::forwardList() {
-	if (!isEmpty()) {
-		Node *p = head;
-		cout << "name\tweight\theight" << endl;
-		cout << "--------------------------" << endl;
-		while (p != 0) {
-			cout << p->name << "\t" << p->weight << "\t" << p->height << endl;
-			p = p->next;
+		{
+			
 		}
-	}
-	else
-		cout << "List is empty." << endl;
+	}*/
 }
 
-void Dll::backwardList() {
-	if (!isEmpty()) {
-		Node *p = head;
-		while (p->next != 0)
-			p = p->next;
-		cout << "name\tweight\theight" << endl;
-		cout << "--------------------------" << endl;
-		while (p != 0) {
-			cout << p->name << "\t" << p->weight << "\t" << p->height << endl;
-			p = p->prev;
-		}
-	}
-	else
-		cout << "List is empty." << endl;
-}
-
-void Dll::searchList(string s) {
-	if (!isEmpty()) {
-		Node *p = head;
-		while (p != 0 && p->name != s)
-			p = p->next;
-		if (p != 0)
-			cout << p->name << " is in the list" << endl;
-		else
-			cout << s << " is not in the list" << endl;
-	}
-	else
-		cout << "List is empty." << endl;
-}
-
-void Dll::findNth(int value) {
+void Dll::forward()
+{
 	Node *p = head;
-	int pos = 1;
+
+	cout << "Name\tWeight\tHeight" << endl;
+	cout << "--------------------------" << endl;
 
 	if (isEmpty())
-		cout << "List is empty." << endl;
-	else {
-		while (p != 0) {
-			if (pos == value) {
-				cout << p->name << "\t" << p->weight << "\t" << p->height<< endl;
-				break;
-			}
-			p = p->next;
-			pos++;
-		}
-		if (p == 0) {
-			cout << value << " list is not in the list." << endl;
-		}
+	{
+		cout << "List is empty" << endl;
+		return;
+	}
+
+	while (p != NULL)
+	{
+		cout << p->name << "\t" << p->weight << "\t" << p->height << endl;
+		p = p->next;
 	}
 }
 
-int main() {
-	Dll ll;
-	int input = 0;
-	string src;
-	int find;
-	int inWeight;
-	int inHeight;
+void Dll::backward()
+{
+	Node *p;
+	p = head;
 
-	ifstream infile;
-	infile.open("data.txt", ios::in);
-
-	if (infile.fail()) {
-		cout << "can't open the input file." << endl;
-		exit(1);
+	if (isEmpty())
+	{
+		cout << "List is empty" << endl;
+		return;
 	}
 
-	for (int i = 0; i < 4; i++) {
-		string s;
-		int w;
-		int h;
-		infile >> s >> w >> h;
-		ll.insertList(s, w, h);
+	while (p->next != NULL)
+		p = p->next;
+
+	cout << "Name\tWeight\tHeight" << endl;
+	cout << "--------------------------" << endl;
+
+	while (p != NULL)
+	{
+		cout << p->name << "\t" << p->weight << "\t" << p->height << endl;
+		p = p->prev;
 	}
-	cout << "Menu" << endl;
-	cout << "---------------------" << endl;
-	cout << "1.Insert-after(nth)\t";
-	cout << "2.Delete\t";
-	cout << "3.Forward" << endl;;
-	cout << "4.Backward\t\t";
-	cout << "5.Search\t";
-	cout << "6.Find-nth" << endl;
-	cout << "7.Exit" << endl;
+}
 
-	while (input <= 6) {
-		cin >> input;
+void Dll::searchDll(string n)
+{
+	Node *p;
+	p = head;
 
-		if (input >= 7) {
-			ll.~Dll();
-			break;
-		}
+	if (isEmpty())
+	{
+		cout << "List is empty" << endl;
+		return;
+	}
 
-		switch (input) {
+	while ((p != NULL) && (p->name != n))
+		p = p->next;
+
+	if (p == NULL)
+		cout << n << " is not in the list" << endl;
+	else
+		cout << n << " is in the list" << endl;
+}
+
+void Dll::findNth(int n)
+{
+	Node *p = head;
+	int cnt = 1;
+
+	while ((p != NULL) && (cnt != n))
+	{
+		p = p->next;
+		cnt++;
+	}
+	
+	if (p == NULL)
+	{
+		switch (n)
+		{
 		case 1:
-			cin >> src >> inWeight >> inHeight >> find;
-			ll.insertAfter(src, inWeight, inHeight, find);
+			cout << n << "st Node is not in the list" << endl;
 			break;
 		case 2:
-			cin >> src;
-			ll.deleteList(src);
+			cout << n << "nd Node is not in the list" << endl;
 			break;
 		case 3:
-			ll.forwardList();
+			cout << n << "rd Node is not in the list" << endl;
 			break;
-		case 4:
-			ll.backwardList();
-			break;
-		case 5:
-			cin >> src;
-			ll.searchList(src);
-			break;
-		case 6:
-			cin >> find;
-			ll.findNth(find);
+		default:
+			cout << n << "th Node is not in the list" << endl;
 			break;
 		}
 	}
+	else
+	{
+		cout << p->name << "\t" << p->weight << "\t" << p->height << endl;
+	}
+}
+
+int main()
+{
+	Dll dll;
+	ifstream input;
+	string name;
+	int weight, height;
+	input.open("data.txt", ios::in);
+
+	while (!input.eof())
+	{
+		input >> name >> weight >> height;
+		dll.insertDll(name, weight, height);
+	}
+
+	dll.forward();
+	cout << endl;
+
+	dll.searchDll("lee");
+	cout << endl;
+
+	dll.deleteDll("lee");
+	dll.forward();
+	cout << endl;
+
+	dll.insertAfter("park", 73, 176, 2);
+	dll.forward();
+	cout << endl;
+
+	dll.findNth(2);
+	cout << endl;
+
+	dll.backward();
 }
