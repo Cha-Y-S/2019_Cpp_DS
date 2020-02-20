@@ -3,145 +3,200 @@
 
 using namespace std;
 
-const char const prec[4][2] = { '*',2,'/',2,'+',1,'-',1 };
+char prec[4][2] = { '*',2,'/',2,'+',1,'-',1 };
 
-struct Node {
+struct Node
+{
 	char data;
 	int prio;
-	Node* left;
-	Node* right;
-	Node(char value) {
-		data = value;
+	Node *left;
+	Node *right;
+	Node(char data)
+	{
+		this->data = data;
 		prio = 4;
-		left = 0;
-		right = 0;
+		left = NULL;
+		right = NULL;
 	}
 };
 
-class Tree {
+class Tree
+{
+public:
+	Tree();
+	~Tree();
+	bool isDigit(int value);
+	bool isEmpty();
+	void buildTree(char value);
+	void insertOperand(Node *ptr);
+	void insertOperator(Node *ptr);
+	void inorder(Node *ptr);
+	void callInorder();
+	void preorder(Node *ptr);
+	void callPreorder();
+	void postorder(Node *ptr);
+	void callPostorder();
+	void expression(Node *ptr);
+	void callExpression();
+	int evaluation(Node *ptr);
+	int callEvaluation();
 private:
 	Node *root;
-public:
-	Tree() {
-		root = 0;
-	}
-	bool isEmpty();
-	bool isdigit(int value);
-	void inorder(Node *ptr);
-	void postorder(Node *ptr);
-	void preorder(Node *ptr);
-	void Operand(Node *ptr);
-	void Operator(Node *ptr);
-	void buildTree(char input);
-	int evalTree(Node *ptr);
-	void parentheses(Node *ptr);
-	Node* getRoot();
 };
 
-bool Tree::isdigit(int value) {
-	if (value == 5)
+Tree::Tree()
+{
+	root = NULL;
+}
+
+Tree::~Tree()
+{
+	delete root;
+}
+
+bool Tree::isDigit(int value)
+{
+	if (value == 4)
 		return true;
 	else
 		return false;
 }
 
-bool Tree::isEmpty() {
-	if (root == 0)
+bool Tree::isEmpty()
+{
+	if (root == NULL)
 		return true;
 	else
 		return false;
 }
 
-void Tree::inorder(Node *ptr) {
+void Tree::buildTree(char value)
+{
+	Node *temp = new Node(value);
+
+	for (int i = 0; i < 4; i++)
 	{
-		if (ptr) {
-			inorder(ptr->left);
-			cout << ptr->data << " ";
-			inorder(ptr->right);
+		if (temp->data == prec[i][0])
+		{
+			temp->prio = prec[i][1] - '0';
+			break;
 		}
+		else
+			temp->prio = 4;
+	}
+	
+	if (isDigit(temp->prio))
+		insertOperand(temp);
+	else
+		insertOperator(temp);
+}
+
+void Tree::insertOperand(Node *ptr)
+{
+	if (isEmpty())
+		root = ptr;
+	else
+	{
+		Node *p = root;
+		while (p->right != NULL)
+			p = p->right;
+		p->right = ptr;
 	}
 }
 
-void Tree::postorder(Node *ptr) {
-	if (ptr) {
-		postorder(ptr->left);
-		postorder(ptr->right);
+void Tree::insertOperator(Node *ptr)
+{
+	if (root->prio >= ptr->prio)
+	{
+		ptr->left = root;
+		root = ptr;
+	}
+	else
+	{
+		ptr->left = root->right;
+		root->right = ptr;
+	}
+}
+
+void Tree::inorder(Node *ptr)
+{
+	if (ptr)
+	{
+		inorder(ptr->left);
 		cout << ptr->data << " ";
-
+		inorder(ptr->right);
 	}
 }
 
-void Tree::preorder(Node *ptr) {
-	if (ptr) {
+void Tree::callInorder()
+{
+	inorder(root);
+}
+
+void Tree::preorder(Node *ptr)
+{
+	if (ptr)
+	{
 		cout << ptr->data << " ";
 		preorder(ptr->left);
 		preorder(ptr->right);
 	}
 }
 
-void Tree::buildTree(char input) {
-	while (input != NULL) {
-		Node *temp = new Node(input);
+void Tree::callPreorder()
+{
+	preorder(root);
+}
 
-		for (int i = 0; i < 4; i++) {
-			if (temp->data == prec[i][0]) {
-				temp->prio = prec[i][1] - '0';
-				break;
-			}
-			else {
-				temp->prio = 5;
-			}
-		}
-
-		if (temp->prio == 5) {
-			Operand(temp);
-			break;
-		}
-		else {
-			Operator(temp);
-			break;
-		}
+void Tree::postorder(Node *ptr)
+{
+	if (ptr)
+	{
+		postorder(ptr->left);
+		postorder(ptr->right);
+		cout << ptr->data << " ";
 	}
 }
 
-void Tree::Operand(Node *ptr) {
-	Node *p;
-	if (isEmpty()) {
-		root = ptr;
-	}
-	else {
-		p = root;
-		while (p->right != NULL) {
-			p = p->right;
-		}
-		p->right = ptr;
+void Tree::callPostorder()
+{
+	postorder(root);
+}
+
+void Tree::expression(Node *ptr)
+{
+	if (ptr)
+	{
+		if (!isDigit(ptr->prio))
+			cout << "( ";
+
+		expression(ptr->left);
+		cout << ptr->data << " ";
+		expression(ptr->right);
+
+		if (!isDigit(ptr->prio))
+			cout << ") ";
 	}
 }
 
-void Tree::Operator(Node *ptr) {
-	if (root->prio >= ptr->prio) {
-		ptr->left = root;
-		root = ptr;
-	}
-	else {
-		ptr->left = root->right;
-		root->right = ptr;
-	}
+void Tree::callExpression()
+{
+	expression(root);
 }
 
-Node* Tree::getRoot() {
-	return root;
-}
-
-int Tree::evalTree(Node *ptr) {
+int Tree::evaluation(Node *ptr)
+{
 	int value, left, right;
-	if (!isEmpty()) {
-		if (ptr->left == 0 && ptr->right == 0)
+	if (ptr)
+	{
+		if (isDigit(ptr->prio))
 			value = ptr->data - '0';
-		else {
-			left = evalTree(ptr->left);
-			right = evalTree(ptr->right);
-			switch (ptr->data) {
+		else
+		{
+			left = evaluation(ptr->left);
+			right = evaluation(ptr->right);
+			switch (ptr->data)
+			{
 			case '+':
 				value = left + right;
 				break;
@@ -157,66 +212,57 @@ int Tree::evalTree(Node *ptr) {
 			}
 		}
 	}
-	else {
-		cout << "Empty Tree" << endl;
+	else
+	{
+		cout << "Tree is empty" << endl;
 		return 0;
 	}
-
 	return value;
 }
 
-void Tree::parentheses(Node *ptr) {
-	if (ptr != NULL) {
-		if (!isdigit(ptr->prio))
-			cout << "( ";
-		parentheses(ptr->left);
-		cout << ptr->data<< " ";
-		parentheses(ptr->right);
-		if (!isdigit(ptr->prio))
-			cout << ") ";
-	}
+int Tree::callEvaluation()
+{
+	return evaluation(root);
 }
 
-int main() {
-	ifstream infile;
-	infile.open("lab7.txt", ios::in);
-	char input[100];
-	for (int j = 0; j < 3; j++) {
-		
-		
-		while (infile.getline(input, 100)) {
-			Tree tree;
-			int i = 0;
-			cout << "Math expression : ";
-			cout << input;
-			while (input[i] != 0) {
-				tree.buildTree(input[i]);
-				i++;
-			}
-
-			cout << endl;
-			cout << "  Inorder : ";
-			tree.inorder(tree.getRoot());
-			cout << endl;
-
-			cout << endl;
-			cout << "  Postorder : ";
-			tree.postorder(tree.getRoot());
-			cout << endl;
-
-			cout << endl;
-			cout << "  Preorder : ";
-			tree.preorder(tree.getRoot());
-			cout << endl;
-
-			cout << endl;
-			cout << "  Evaluation : ";
-			cout << tree.evalTree(tree.getRoot()) << endl;
-
-			cout << endl;
-			cout << "  Parentheses : ";
-			tree.parentheses(tree.getRoot());
-			cout << endl;
-		}
+int main()
+{
+	Tree tree;
+	ifstream input;
+	input.open("data.txt", ios::in);
+	cout << "Math Expression : ";
+	while (true)
+	{
+		char value;
+		input >> value;
+		if (input.eof())
+			break;
+		tree.buildTree(value);
+		cout << value << " ";
+		// cout << "input : " << input.eof() << endl;
 	}
+
+	cout << endl;
+
+	cout << "preorder : ";
+	tree.callPreorder();
+	cout << endl;
+
+	cout << "inorder : ";
+	tree.callInorder();
+	cout << endl;
+
+	cout << "postorder : ";
+	tree.callPostorder();
+	cout << endl;
+
+	cout << "Expression : ";
+	tree.callExpression();
+	cout << endl;
+	
+	cout << "Evaluation : ";
+	cout << tree.callEvaluation();
+	cout << endl;
+
+	return 0;
 }
